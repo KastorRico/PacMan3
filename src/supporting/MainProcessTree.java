@@ -8,11 +8,6 @@ public class MainProcessTree {
     private short[][] screenData;
     private Point pacmanPosition;
     private ArrayList<Point> ghosts;
-
-    public Node getRoot() {
-        return root;
-    }
-
     private Node root;
 
     public MainProcessTree(short[][] screenData, Point pacmanPosition, ArrayList<Point> ghosts) {
@@ -22,6 +17,10 @@ public class MainProcessTree {
         this.ghosts.addAll(ghosts);
         root = new Node(new LevelDate(screenData, pacmanPosition, ghosts), null);
         generateVariations(screenData, pacmanPosition, ghosts);
+    }
+
+    public Node getRoot() {
+        return root;
     }
 
     private void generateVariations(short[][] screenData, Point pacman, ArrayList<Point> ghosts) {
@@ -45,6 +44,23 @@ public class MainProcessTree {
             root.addChildren(newNode);
             addLevelDataGhosts(newNode);
         }
+
+        for (Node node : root.childrenList)
+            for (Node node1 : node.childrenList)
+                for (Node node2 : node1.childrenList) {
+                    if (pacman.x + 1 < screenData.length) {
+                        node2.addChildren(new Node(new LevelDate(screenData, new Point(pacman.x + 1, pacman.y), ghosts), root));
+                    }
+                    if (pacman.x - 1 >= 0) {
+                        node2.addChildren(new Node(new LevelDate(screenData, new Point(pacman.x - 1, pacman.y), ghosts), root));
+                    }
+                    if (pacman.y + 1 < screenData.length) {
+                        node2.addChildren(new Node(new LevelDate(screenData, new Point(pacman.x, pacman.y + 1), ghosts), root));
+                    }
+                    if (pacman.y - 1 >= 0) {
+                        node2.addChildren(new Node(new LevelDate(screenData, new Point(pacman.x, pacman.y - 1), ghosts), root));
+                    }
+                }
     }
 
 

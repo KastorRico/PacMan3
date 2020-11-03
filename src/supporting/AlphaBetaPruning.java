@@ -5,9 +5,10 @@ import java.util.ArrayList;
 public class AlphaBetaPruning {
     int value;
     ArrayList<Node> result;
+
     public AlphaBetaPruning(MainProcessTree tree) {
-        result = new ArrayList<Node>();
-        alphabeta(tree.getRoot(),2,Integer.MIN_VALUE,Integer.MAX_VALUE,true);
+        result = new ArrayList<>();
+        alphabeta(tree.getRoot(), 2, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
     }
 
     private int alphabeta(Node node, int depth, int alpha, int beta, boolean maximizingPlayer) {
@@ -16,8 +17,8 @@ public class AlphaBetaPruning {
             node.value.setWeight(Integer.MIN_VALUE);
             for (Node child : node.childrenList) {
                 node.value.setWeight(Math.max(node.value.getWeight(), alphabeta(child, depth - 1, alpha, beta, false)));
-                alpha = (int) Math.max(alpha,node.value.getWeight());
-                if(alpha>=beta) break;
+                alpha = Math.max(alpha, node.value.getWeight());
+                if (alpha >= beta) break;
             }
             result.add(node);
             return node.value.getWeight();
@@ -25,13 +26,12 @@ public class AlphaBetaPruning {
             node.value.setWeight(Integer.MAX_VALUE);
             for (Node child : node.childrenList) {
                 node.value.setWeight(Math.min(node.value.getWeight(), alphabeta(child, depth - 1, alpha, beta, true)));
-                beta = Math.min(beta,node.value.getWeight());
-                if(beta<=alpha) break;
+                beta = Math.min(beta, node.value.getWeight());
+                if (beta <= alpha) break;
             }
             result.add(node);
             return node.value.getWeight();
         }
-        return 0;
     }
-    
+
 }

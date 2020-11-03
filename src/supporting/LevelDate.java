@@ -6,15 +6,15 @@ public class LevelDate {
     private Point pacmanLocation;
     private ArrayList<Point> ghostsLocation;
 
-    public double getWeight() {
+    public int getWeight() {
         return weight;
     }
 
-    public void setWeight(double weight) {
+    public void setWeight(int weight) {
         this.weight = weight;
     }
 
-    private double weight;
+    private int weight;
     private short[][] data;
 
     public LevelDate(short[][] levelData, Point pacmanLocation, ArrayList<Point> ghostsLocation) {
@@ -24,7 +24,7 @@ public class LevelDate {
         weight = heuristic();
     }
 
-    private double heuristic() {
+    private int heuristic() {
         return 0;
     }
 }
