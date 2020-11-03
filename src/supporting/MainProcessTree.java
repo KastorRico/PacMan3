@@ -9,6 +9,10 @@ public class MainProcessTree {
     private Point pacmanPosition;
     private ArrayList<Point> ghosts;
 
+    public Node getRoot() {
+        return root;
+    }
+
     private Node root;
 
     public MainProcessTree(short[][] screenData, Point pacmanPosition, ArrayList<Point> ghosts) {
