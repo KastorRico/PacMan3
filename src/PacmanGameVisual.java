@@ -25,6 +25,7 @@ public class PacmanGameVisual extends JFrame {
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
     };
     Pacman pacman;
+    Ghost ghost;
     Random random = new Random();
 
     public PacmanGameVisual() {
@@ -32,7 +33,7 @@ public class PacmanGameVisual extends JFrame {
         Point randomEnd = searchEmptyPoint(levelData);
         levelData[randomEnd.y][randomEnd.x] = 16;
         Point randomStart = searchEmptyPoint(levelData);
-
+        ghost = new Ghost(new AStar(mainGraph, randomStart, randomEnd), new Point(1,1), randomEnd);
         pacman = new Pacman(new AStar(mainGraph, randomStart, randomEnd), randomStart, randomEnd);
         initUI();
     }
@@ -71,7 +72,7 @@ public class PacmanGameVisual extends JFrame {
     }
 
     private void initUI() {
-        Board board = new Board(levelData, pacman);
+        Board board = new Board(levelData, pacman,ghost);
         add(board);
         setTitle("Pacman");
         setDefaultCloseOperation(EXIT_ON_CLOSE);

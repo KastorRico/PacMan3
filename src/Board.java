@@ -14,11 +14,14 @@ public class Board extends JPanel implements ActionListener {
     Timer timer;
     public short[][] screenData;
     Pacman pacman;
+    Ghost ghost;
 
-    public Board(short[][] screenData, Pacman pacman) {
+    public Board(short[][] screenData, Pacman pacman, Ghost ghost) {
         this.screenData = screenData.clone();
         this.pacman = pacman;
+        this.ghost =ghost;
         pacman.setBoard(this);
+        ghost.setBoard(this);
         initVariables();
         initBoard();
     }
@@ -32,6 +35,7 @@ public class Board extends JPanel implements ActionListener {
         setFocusable(true);
         setBackground(Color.black);
         pacman.initPacmanImages();
+        ghost.initGhostImages();
     }
 
     private void initVariables() {
@@ -96,7 +100,7 @@ public class Board extends JPanel implements ActionListener {
 
         drawMaze(g2d);
         pacman.step(g2d);
-
+        ghost.step(g2d);
         Toolkit.getDefaultToolkit().sync();
         g2d.dispose();
     }
