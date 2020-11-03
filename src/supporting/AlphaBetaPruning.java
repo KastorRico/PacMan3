@@ -14,7 +14,7 @@ public class AlphaBetaPruning {
         if (depth == 0 || node.haveChildren()) return node.value.getWeight();
         if (maximizingPlayer) {
             node.value.setWeight(Integer.MIN_VALUE);
-            for (Node child : node.list) {
+            for (Node child : node.childrenList) {
                 node.value.setWeight(Math.max(node.value.getWeight(), alphabeta(child, depth - 1, alpha, beta, false)));
                 alpha = (int) Math.max(alpha,node.value.getWeight());
                 if(alpha>=beta) break;
@@ -23,7 +23,7 @@ public class AlphaBetaPruning {
             return node.value.getWeight();
         } else {
             node.value.setWeight(Integer.MAX_VALUE);
-            for (Node child : node.list) {
+            for (Node child : node.childrenList) {
                 node.value.setWeight(Math.min(node.value.getWeight(), alphabeta(child, depth - 1, alpha, beta, true)));
                 beta = Math.min(beta,node.value.getWeight());
                 if(beta<=alpha) break;
