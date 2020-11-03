@@ -8,7 +8,7 @@ public class Minimax {
     public Minimax() {
     }
 
-    public ArrayList<Node> findStrategy(Tree tree) {
+    public ArrayList<Node> findStrategy(MainProcessTree tree) {
         helpToFind(GLOBALDEPTH, tree.tree, true);
         ArrayList<Node> copyResult = new ArrayList<>();
         for(int i = result.size();i>=0;i--)
