@@ -8,16 +8,16 @@ public class Minimax {
     public Minimax() {
     }
 
-    public ArrayList<Node> findStrategy(MainProcessTree tree) {
+    public ArrayList<Point> findStrategy(MainProcessTree tree) {
         helpToFind(GLOBALDEPTH, tree.getRoot(), true);
-        ArrayList<Node> copyResult = new ArrayList<>();
+        ArrayList<Point> copyResult = new ArrayList<>();
         for (int i = result.size(); i >= 0; i--)
-            copyResult.add(result.get(i));
+            copyResult.add(result.get(i).value.getPacmanLocation());
         result.clear();
         return copyResult;
     }
 
-    private double helpToFind(int depth, Node node, boolean maxPlay) {
+    private int helpToFind(int depth, Node node, boolean maxPlay) {
         if (depth == 0) return node.value.getWeight();
         if (maxPlay) {
             node.value.setWeight(Integer.MIN_VALUE);
@@ -31,7 +31,6 @@ public class Minimax {
             for (Node n : node.childrenList) {
                 node.value.setWeight(Math.min(node.value.getWeight(), helpToFind(depth - 1, n, true)));
             }
-            result.add(node);
         }
         return 0;
     }

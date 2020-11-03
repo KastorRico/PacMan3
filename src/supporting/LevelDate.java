@@ -3,6 +3,10 @@ package supporting;
 import java.util.ArrayList;
 
 public class LevelDate {
+    public Point getPacmanLocation() {
+        return pacmanLocation;
+    }
+
     private Point pacmanLocation;
     private ArrayList<Point> ghostsLocation;
 
