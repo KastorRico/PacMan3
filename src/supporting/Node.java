@@ -18,6 +18,6 @@ public class Node {
     }
 
     public boolean haveChildren(){
-        return childrenList.isEmpty();
+        return !childrenList.isEmpty();
     }
 }
