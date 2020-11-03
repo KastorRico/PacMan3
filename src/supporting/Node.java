@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Node {
     LevelDate value;
-    ArrayList<Node> childrenList;
+    public ArrayList<Node> childrenList;
     Node parent;
 
     public Node(LevelDate value, Node parent) {
