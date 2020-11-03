@@ -1,41 +1,83 @@
+import supporting.Point;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class Board extends JPanel implements ActionListener {
     static final int BLOCK_SIZE = 24;
     static final int POINT_SIZE = 6;
     final Color dotColor = new Color(192, 192, 0);
-    Dimension d;
-    Color mazeColor;
-    Timer timer;
-    public short[][] screenData;
-    Pacman pacman;
-    Ghost ghost;
 
-    public Board(short[][] screenData, Pacman pacman, Ghost ghost) {
-        this.screenData = screenData.clone();
-        this.pacman = pacman;
-        this.ghost =ghost;
-        pacman.setBoard(this);
-        ghost.setBoard(this);
+    private final int startCountOfDots = 1;
+    private int countOfDots;
+    private final int deltaLevelDots = 1;
+
+    private static final int DEFAULT_COUNT_OF_LIVE = 3;
+    private static final int DEFAULT_COUNT_OF_GHOSTS = 2;
+    private int countOfLife;
+
+    public Timer timer;
+    public short[][] screenData;
+    public short[][] emptyScreenData;
+    Pacman pacman;
+    ArrayList<Ghost> ghosts = new ArrayList<>();
+    private Random random = new Random();
+    private Dimension d;
+    private Color mazeColor;
+    private int level = 0;
+    private int scope = 0;
+
+    private Point PACMAN_START = new Point(0, 0);
+
+    public Board(short[][] screenData) {
+        this.emptyScreenData = screenData.clone();
+        this.pacman = new Pacman(new AStar(), this,  PACMAN_START);
+        countOfLife = DEFAULT_COUNT_OF_LIVE;
+
+        ghosts = new ArrayList<>(DEFAULT_COUNT_OF_GHOSTS);
+        for (int i = 0; i < DEFAULT_COUNT_OF_GHOSTS; i++)
+            ghosts.add(new Ghost(new AStar(), this, searchEmptyPoint(screenData)));
+
+        levelUp();
         initVariables();
         initBoard();
     }
 
-    public Board(short[][] screenData) {
-        this.screenData = screenData.clone();
+    private void levelUp() {
+        level++;
+        countOfDots = startCountOfDots + level * deltaLevelDots;
+
+        screenData = emptyScreenData.clone();
+        for(int i = 0; i < countOfDots; i++){
+            Point dotPoint = searchEmptyPoint(screenData);
+            screenData[dotPoint.x][dotPoint.y] = 16;
+        }
     }
 
     private void initBoard() {
-        addKeyListener(new TAdapter());
         setFocusable(true);
         setBackground(Color.black);
         pacman.initPacmanImages();
-        ghost.initGhostImages();
+    }
+
+    private boolean checkLevelData() {
+
+        if(screenData[pacman.pacman_x][pacman.pacman_y] % 16 == 0){
+            screenData[pacman.pacman_x][pacman.pacman_y] = 0;
+        scope++;}
+
+        int countOfDots = 0;
+        for (int i = 0; i < screenData.length; i++)
+            for (int j = 0; j < screenData[0].length; j++)
+                if (screenData[i][j] % 16 == 0)
+                    countOfDots++;
+        return countOfDots == 0;
     }
 
     private void initVariables() {
@@ -55,7 +97,7 @@ public class Board extends JPanel implements ActionListener {
     private void drawMaze(Graphics2D g2d) {
         g2d.setStroke(new BasicStroke(2));
         g2d.setColor(mazeColor);
-        g2d.drawRect(0, 0, screenData[0].length*BLOCK_SIZE, screenData.length * BLOCK_SIZE);
+        g2d.drawRect(0, 0, screenData[0].length * BLOCK_SIZE, screenData.length * BLOCK_SIZE);
         for (int i = 0; i < screenData.length; i++) {
             for (int j = 0; j < screenData[i].length; j++) {
                 int x = j * BLOCK_SIZE;
@@ -91,7 +133,32 @@ public class Board extends JPanel implements ActionListener {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+
+        if(checkLevelData())
+            levelUp();
+        if(isPacmanDie())
+            pacmanDie();
+
         doDrawing(g);
+    }
+
+    private boolean isPacmanDie() {
+        for(Ghost ghost: ghosts)
+            if(pacman.pacman_x == ghost.ghost_x && pacman.pacman_y == ghost.ghost_y)
+                return true;
+        return false;
+    }
+
+    private void pacmanDie() {
+        countOfLife--;
+        if(countOfLife <= 0) stop(); // END GAME
+
+        ghosts = new ArrayList<>(DEFAULT_COUNT_OF_GHOSTS);
+        for (int i = 0; i < DEFAULT_COUNT_OF_GHOSTS; i++)
+            ghosts.add(new Ghost(new AStar(), this, searchEmptyPoint(screenData)));
+
+        pacman.pacman_x = PACMAN_START.x;
+        pacman.pacman_y = PACMAN_START.y;
     }
 
     private void doDrawing(Graphics g) {
@@ -100,19 +167,30 @@ public class Board extends JPanel implements ActionListener {
 
         drawMaze(g2d);
         pacman.step(g2d);
-        ghost.step(g2d);
+        ghosts.forEach(ghost -> ghost.step(g2d));
         Toolkit.getDefaultToolkit().sync();
         g2d.dispose();
     }
 
 
     public void stop() {
-            timer.stop();
+        timer.stop();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         repaint();
+    }
+
+    private Point searchEmptyPoint(short[][] levelData) {
+        Point randomPoint;
+        do {
+            randomPoint = new Point(random.nextInt(15), random.nextInt(15));
+            if (levelData[randomPoint.y][randomPoint.x] != 0)
+                continue;
+            break;
+        } while (true);
+        return randomPoint;
     }
 
     class TAdapter extends KeyAdapter {

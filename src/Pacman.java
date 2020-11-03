@@ -12,29 +12,19 @@ public class Pacman {
     private static Image pacman4up, pacman4down, pacman4left, pacman4right;
 
     int animationCount = 0;
-    int pacmanSteps = 0;
     int additionAnimationY = 0, additionAnimationX = 0;
-    Point startPosition, finishPosition;
     SearchPath searchPath;
     Board board;
-    private int pacman_x, pacman_y;
+    public int pacman_x, pacman_y;
     private int directionPacmanX, directionPacmanY;
     private int pacmanAnimPos = 0;
 
-    public Pacman(SearchPath searchPath, Point startPosition, Point finishPosition) {
-        this.searchPath = searchPath;
-        this.startPosition = startPosition;
-        this.finishPosition = finishPosition;
-        init();
+    public Pacman(SearchPath searchPath, Board board, Point start) {
         initPacmanImages();
-    }
-
-    void setBoard(Board board) {
+        this.searchPath = searchPath;
         this.board = board;
-    }
-
-    void init() {
-        movePacmanTo(startPosition.y, startPosition.x);
+        pacman_x = start.x;
+        pacman_y = start.y;
     }
 
     void initPacmanImages() {
@@ -159,13 +149,5 @@ public class Pacman {
         if (animationCount++ == 0) {
             animationMovePacman();
         }
-    }
-
-    public int getCountOfStepsToFind() {
-        return searchPath.getCountStepsToFind();
-    }
-
-    public long getSteps() {
-        return searchPath.getCountStepsFromStartToFinish();
     }
 }

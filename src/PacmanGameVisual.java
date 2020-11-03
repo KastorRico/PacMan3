@@ -24,17 +24,11 @@ public class PacmanGameVisual extends JFrame {
             {0, 9, 10, 10, 14, 0, 0, 9, 12, 0, 0, 11, 10, 10, 12, 0},
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
     };
-    Pacman pacman;
-    Ghost ghost;
-    Random random = new Random();
+    private Pacman pacman;
+    private Ghost ghost;
+    private Random random = new Random();
 
     public PacmanGameVisual() {
-        Graph mainGraph = buildGraphOnMatrix(levelData);
-        Point randomEnd = searchEmptyPoint(levelData);
-        levelData[randomEnd.y][randomEnd.x] = 16;
-        Point randomStart = searchEmptyPoint(levelData);
-        ghost = new Ghost(new AStar(mainGraph, randomStart, randomEnd), new Point(1,1), randomEnd);
-        pacman = new Pacman(new AStar(mainGraph, randomStart, randomEnd), randomStart, randomEnd);
         initUI();
     }
 
@@ -45,34 +39,8 @@ public class PacmanGameVisual extends JFrame {
         });
     }
 
-    private Point searchEmptyPoint(short[][] levelData) {
-        Point randomPoint;
-        do {
-            randomPoint = new Point(random.nextInt(15), random.nextInt(15));
-            if (levelData[randomPoint.y][randomPoint.x] != 0)
-                continue;
-            break;
-        } while (true);
-        return randomPoint;
-    }
-
-    private Graph buildGraphOnMatrix(short[][] levelData) {
-        Graph graph = new Graph(levelData.length * levelData[0].length);
-        for (int y = 0; y < levelData.length; y++) {
-            for (int x = 0; x < levelData[y].length; x++) {
-                if (levelData[y][x] == 0) {
-                    if (x + 1 < levelData[y].length && levelData[y][x + 1] == 0 )
-                        graph.addEdge(new Point(x, y), new Point(x + 1, y));
-                    if (y + 1 < levelData.length && levelData[y + 1][x] == 0)
-                        graph.addEdge(new Point(x, y), new Point(x, y + 1));
-                }
-            }
-        }
-        return graph;
-    }
-
     private void initUI() {
-        Board board = new Board(levelData, pacman,ghost);
+        Board board = new Board(levelData);
         add(board);
         setTitle("Pacman");
         setDefaultCloseOperation(EXIT_ON_CLOSE);

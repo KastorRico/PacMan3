@@ -10,59 +10,24 @@ public class Ghost {
     private static Image ghost;
 
     int animationCount = 0;
-    int ghostSteps = 0;
     int additionAnimationY = 0, additionAnimationX = 0;
-    supporting.Point startPosition, finishPosition;
     SearchPath searchPath;
     Board board;
-    private int Ghost_x, Ghost_y;
+    public int ghost_x, ghost_y;
     private int directionGhostX, directionGhostY;
-    private int GhostAnimPos = 0;
+    private int ghostAnimPos = 0;
 
-    public Ghost(SearchPath searchPath, supporting.Point startPosition, supporting.Point finishPosition) {
+    public Ghost(SearchPath searchPath, Board board, Point startPosition) {
         this.searchPath = searchPath;
-        this.startPosition = startPosition;
-        this.finishPosition = finishPosition;
-        init();
+        this.board = board;
+        ghost_x = startPosition.x;
+        ghost_y = startPosition.y;
         initGhostImages();
     }
 
-    void setBoard(Board board) {
-        this.board = board;
-    }
-
-    void init() {
-        moveGhostTo(startPosition.y, startPosition.x);
-    }
-
-    void initGhostImages() {
+    private void initGhostImages() {
         ghost = new ImageIcon("images/ghost.png").getImage();
     }
-
-    void animationMoveGhost() {
-        Point point = searchPath.getNextVisualPoint();
-        if (point == null)
-            board.stop();
-        else
-            moveGhostTo(point.y, point.x);
-    }
-
-    private void moveGhostTo(int j, int i) {
-        directionGhostX = (i - Ghost_x);
-        directionGhostY = (j - Ghost_y);
-
-        Ghost_x = i;
-        Ghost_y = j;
-    }
-
-    public void drawGhost(Graphics2D g2d) {
-        //additionAnimationX = -1 * directionGhostX * (ANIMATION_STEPS - animationCount) * (Board.BLOCK_SIZE / ANIMATION_STEPS);
-        //additionAnimationY = -1 * directionGhostY * (ANIMATION_STEPS - animationCount) * (Board.BLOCK_SIZE / ANIMATION_STEPS);
-        GhostAnimPos++;
-        GhostAnimPos %= Ghost_ANIM_IMAGE;
-        g2d.drawImage(ghost, Ghost_x * Board.BLOCK_SIZE + additionAnimationX,Ghost_y * Board.BLOCK_SIZE + additionAnimationY, board);
-    }
-
 
     public void step(Graphics2D g2d) {
         drawGhost(g2d);
@@ -72,11 +37,24 @@ public class Ghost {
         }
     }
 
-    public int getCountOfStepsToFind() {
-        return searchPath.getCountStepsToFind();
+    public void drawGhost(Graphics2D g2d) {
+        additionAnimationX = -1 * directionGhostX * (ANIMATION_STEPS - animationCount) * (Board.BLOCK_SIZE / ANIMATION_STEPS);
+        additionAnimationY = -1 * directionGhostY * (ANIMATION_STEPS - animationCount) * (Board.BLOCK_SIZE / ANIMATION_STEPS);
+        ghostAnimPos++;
+        ghostAnimPos %= Ghost_ANIM_IMAGE;
+        g2d.drawImage(ghost, ghost_x * Board.BLOCK_SIZE + additionAnimationX, ghost_y * Board.BLOCK_SIZE + additionAnimationY, board);
     }
 
-    public long getSteps() {
-        return searchPath.getCountStepsFromStartToFinish();
+    void animationMoveGhost() {
+        Point point = searchPath.getNextVisualPoint();
+        moveGhostTo(point.y, point.x);
+    }
+
+    private void moveGhostTo(int j, int i) {
+        directionGhostX = (i - ghost_x);
+        directionGhostY = (j - ghost_y);
+
+        ghost_x = i;
+        ghost_y = j;
     }
 }
