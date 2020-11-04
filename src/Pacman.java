@@ -3,6 +3,8 @@ import supporting.SearchPath;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 
 public class Pacman {
     static final int PACMAN_ANIM_IMAGE = 4;
@@ -13,15 +15,16 @@ public class Pacman {
 
     int animationCount = 0;
     int additionAnimationY = 0, additionAnimationX = 0;
-    SearchPath searchPath;
+    //SearchPath searchPath;
+    ArrayDeque<Point> searchPath = new ArrayDeque<>();
     Board board;
     public int pacman_x, pacman_y;
     private int directionPacmanX, directionPacmanY;
     private int pacmanAnimPos = 0;
 
-    public Pacman(SearchPath searchPath, Board board, Point start) {
+    public Pacman(Board board, Point start) {
         initPacmanImages();
-        this.searchPath = searchPath;
+      //  this.searchPath = searchPath;
         this.board = board;
         pacman_x = start.x;
         pacman_y = start.y;
@@ -44,7 +47,8 @@ public class Pacman {
     }
 
     void animationMovePacman() {
-        Point point = searchPath.getNextVisualPoint();
+        //Point point = searchPath.getNextVisualPoint();
+        Point point = searchPath.pop();
         if (point == null)
             board.stop();
         else

@@ -33,6 +33,7 @@ public class LevelDate {
         val += -1 * distanceToGhost(ghostsLocation.get(0));
         val += -1 * distanceToGhost(ghostsLocation.get(1));
 
+
         val += countOfDotsAroundPacman();
         return val;
     }

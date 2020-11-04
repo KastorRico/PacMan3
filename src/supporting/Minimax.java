@@ -11,27 +11,28 @@ public class Minimax {
     public ArrayList<Point> findStrategy(MainProcessTree tree) {
         helpToFind(GLOBALDEPTH, tree.getRoot(), true);
         ArrayList<Point> copyResult = new ArrayList<>();
-        for (int i = result.size(); i >= 0; i--)
+        for (int i = result.size()-1; i >= 0; i--)
             copyResult.add(result.get(i).value.getPacmanLocation());
         result.clear();
         return copyResult;
     }
 
     private int helpToFind(int depth, Node node, boolean maxPlay) {
-        if (depth == 0) return node.value.getWeight();
+        if (depth == 0 || !node.haveChildren()){ return node.value.getWeight(); }
         if (maxPlay) {
             node.value.setWeight(Integer.MIN_VALUE);
             for (Node n : node.childrenList) {
-                node.value.setWeight(Math.max(node.value.getWeight(), helpToFind(depth - 1, n, true)));
+                node.value.setWeight(Math.max(node.value.getWeight(), helpToFind(depth - 1, n, false)));
             }
-            result.add(node);
-
+            //result.add(node);
+            return node.value.getWeight();
         } else {
             node.value.setWeight(Integer.MAX_VALUE);
             for (Node n : node.childrenList) {
                 node.value.setWeight(Math.min(node.value.getWeight(), helpToFind(depth - 1, n, true)));
             }
+            result.add(node);
+            return node.value.getWeight();
         }
-        return 0;
     }
 }

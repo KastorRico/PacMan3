@@ -8,7 +8,7 @@ public class AlphaBetaPruning {
 
     public AlphaBetaPruning(MainProcessTree tree) {
         result = new ArrayList<>();
-        alphabeta(tree.getRoot(), 2, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+        alphabeta(tree.getRoot(), 4, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
     }
 
     private int alphabeta(Node node, int depth, int alpha, int beta, boolean maximizingPlayer) {
@@ -20,7 +20,7 @@ public class AlphaBetaPruning {
                 alpha = Math.max(alpha, node.value.getWeight());
                 if (alpha >= beta) break;
             }
-            result.add(node);
+            //result.add(node);
             return node.value.getWeight();
         } else {
             node.value.setWeight(Integer.MAX_VALUE);

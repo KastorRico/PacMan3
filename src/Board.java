@@ -1,3 +1,6 @@
+import supporting.AlphaBetaPruning;
+import supporting.MainProcessTree;
+import supporting.Minimax;
 import supporting.Point;
 
 import javax.swing.*;
@@ -37,12 +40,30 @@ public class Board extends JPanel implements ActionListener {
 
     public Board(short[][] screenData) {
         this.emptyScreenData = screenData.clone();
-        this.pacman = new Pacman(new AStar(), this,  PACMAN_START);
+        this.pacman = new Pacman(this,  PACMAN_START);
         countOfLife = DEFAULT_COUNT_OF_LIVE;
 
         ghosts = new ArrayList<>(DEFAULT_COUNT_OF_GHOSTS);
         for (int i = 0; i < DEFAULT_COUNT_OF_GHOSTS; i++)
-            ghosts.add(new Ghost(new AStar(), this, searchEmptyPoint(screenData)));
+            ghosts.add(new Ghost(this, searchEmptyPoint(screenData)));
+
+        ghosts = new ArrayList<>(DEFAULT_COUNT_OF_GHOSTS);
+        ArrayList<Point> ghosts_start = new ArrayList<>();
+        Point ghost_start = null;
+        for (int i = 0; i < DEFAULT_COUNT_OF_GHOSTS; i++) {
+            ghost_start = searchEmptyPoint(screenData);
+            ghosts_start.add(ghost_start);
+            ghosts.add(new Ghost(this, ghost_start));
+        }
+        MainProcessTree tree = new MainProcessTree(screenData,PACMAN_START,ghosts_start);
+        int tr = 0;
+        while (tr<20){
+            //AlphaBetaPruning abp = new AlphaBetaPruning(tree);
+            Minimax mm = new Minimax();
+            pacman.searchPath.addAll(mm.findStrategy(tree));
+            tr++;
+            tree = new MainProcessTree(screenData,pacman.searchPath.getLast(),ghosts_start);
+        }
 
         levelUp();
         initVariables();
@@ -84,7 +105,7 @@ public class Board extends JPanel implements ActionListener {
         mazeColor = new Color(5, 100, 5);
         d = new Dimension(400, 400);
 
-        timer = new Timer(10, this);
+        timer = new Timer(50, this);
         timer.start();
     }
 
@@ -155,7 +176,7 @@ public class Board extends JPanel implements ActionListener {
 
         ghosts = new ArrayList<>(DEFAULT_COUNT_OF_GHOSTS);
         for (int i = 0; i < DEFAULT_COUNT_OF_GHOSTS; i++)
-            ghosts.add(new Ghost(new AStar(), this, searchEmptyPoint(screenData)));
+            ghosts.add(new Ghost(this, searchEmptyPoint(screenData)));
 
         pacman.pacman_x = PACMAN_START.x;
         pacman.pacman_y = PACMAN_START.y;
