@@ -1,5 +1,3 @@
-import supporting.AlphaBetaPruning;
-import supporting.MainProcessTree;
 import supporting.Minimax;
 import supporting.Point;
 
@@ -17,7 +15,7 @@ public class Board extends JPanel implements ActionListener {
     static final int POINT_SIZE = 6;
     final Color dotColor = new Color(192, 192, 0);
 
-    private final int startCountOfDots = 1;
+    private final int startCountOfDots = 32;
     private int countOfDots;
     private final int deltaLevelDots = 1;
 
@@ -40,30 +38,12 @@ public class Board extends JPanel implements ActionListener {
 
     public Board(short[][] screenData) {
         this.emptyScreenData = screenData.clone();
-        this.pacman = new Pacman(this,  PACMAN_START);
+        this.pacman = new Pacman(new Minimax(), this,  PACMAN_START);
         countOfLife = DEFAULT_COUNT_OF_LIVE;
 
         ghosts = new ArrayList<>(DEFAULT_COUNT_OF_GHOSTS);
         for (int i = 0; i < DEFAULT_COUNT_OF_GHOSTS; i++)
-            ghosts.add(new Ghost(this, searchEmptyPoint(screenData)));
-
-        ghosts = new ArrayList<>(DEFAULT_COUNT_OF_GHOSTS);
-        ArrayList<Point> ghosts_start = new ArrayList<>();
-        Point ghost_start = null;
-        for (int i = 0; i < DEFAULT_COUNT_OF_GHOSTS; i++) {
-            ghost_start = searchEmptyPoint(screenData);
-            ghosts_start.add(ghost_start);
-            ghosts.add(new Ghost(this, ghost_start));
-        }
-        MainProcessTree tree = new MainProcessTree(screenData,PACMAN_START,ghosts_start);
-        int tr = 0;
-        while (tr<20){
-            //AlphaBetaPruning abp = new AlphaBetaPruning(tree);
-            Minimax mm = new Minimax();
-            pacman.searchPath.addAll(mm.findStrategy(tree));
-            tr++;
-            tree = new MainProcessTree(screenData,pacman.searchPath.getLast(),ghosts_start);
-        }
+            ghosts.add(new Ghost(new Minimax(), this, new Point(15, 15)));//searchEmptyPoint(screenData)));
 
         levelUp();
         initVariables();
@@ -105,7 +85,7 @@ public class Board extends JPanel implements ActionListener {
         mazeColor = new Color(5, 100, 5);
         d = new Dimension(400, 400);
 
-        timer = new Timer(50, this);
+        timer = new Timer(500, this);
         timer.start();
     }
 
@@ -176,7 +156,7 @@ public class Board extends JPanel implements ActionListener {
 
         ghosts = new ArrayList<>(DEFAULT_COUNT_OF_GHOSTS);
         for (int i = 0; i < DEFAULT_COUNT_OF_GHOSTS; i++)
-            ghosts.add(new Ghost(this, searchEmptyPoint(screenData)));
+            ghosts.add(new Ghost(new Minimax(), this, searchEmptyPoint(screenData)));
 
         pacman.pacman_x = PACMAN_START.x;
         pacman.pacman_y = PACMAN_START.y;
@@ -207,7 +187,7 @@ public class Board extends JPanel implements ActionListener {
         Point randomPoint;
         do {
             randomPoint = new Point(random.nextInt(15), random.nextInt(15));
-            if (levelData[randomPoint.y][randomPoint.x] != 0)
+            if (levelData[randomPoint.x][randomPoint.y] != 0)
                 continue;
             break;
         } while (true);

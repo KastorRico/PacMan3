@@ -1,7 +1,8 @@
 package supporting;
 
+import java.util.ArrayList;
+
 public interface SearchPath {
-    Point getNextVisualPoint();
-    int getCountStepsToFind();
-    int getCountStepsFromStartToFinish();
+    Point findStrategy(MainProcessTree tree);
 }
+

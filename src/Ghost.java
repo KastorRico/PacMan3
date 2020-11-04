@@ -11,14 +11,14 @@ public class Ghost {
 
     int animationCount = 0;
     int additionAnimationY = 0, additionAnimationX = 0;
-    //SearchPath searchPath;
+    SearchPath searchPath;
     Board board;
     public int ghost_x, ghost_y;
     private int directionGhostX, directionGhostY;
     private int ghostAnimPos = 0;
 
-    public Ghost(Board board, Point startPosition) {
-       // this.searchPath = searchPath;
+    public Ghost(SearchPath searchPath, Board board, Point startPosition) {
+        this.searchPath = searchPath;
         this.board = board;
         ghost_x = startPosition.x;
         ghost_y = startPosition.y;
@@ -46,8 +46,8 @@ public class Ghost {
     }
 
     void animationMoveGhost() {
-       // Point point = searchPath.getNextVisualPoint();
-      //  moveGhostTo(point.y, point.x);
+        //Point point = searchPath.getNextVisualPoint();
+        //moveGhostTo(point.y, point.x);
     }
 
     private void moveGhostTo(int j, int i) {

@@ -3,21 +3,20 @@ package supporting;
 import java.util.ArrayList;
 
 public class LevelDate {
-    public Point getPacmanLocation() {
-        return pacmanLocation;
-    }
-
-    private Point pacmanLocation;
-    private ArrayList<Point> ghostsLocation;
+    Point pacmanLocation;
+    ArrayList<Point> ghostsLocation;
+    short[][] data;
     private int weight;
-    private short[][] data;
     private int radius = 3;
-
     public LevelDate(short[][] levelData, Point pacmanLocation, ArrayList<Point> ghostsLocation) {
-        data = levelData;
+        data = levelData.clone();
         this.pacmanLocation = pacmanLocation;
         this.ghostsLocation = ghostsLocation;
         weight = heuristic();
+    }
+
+    public Point getPacmanLocation() {
+        return pacmanLocation;
     }
 
     public int getWeight() {
@@ -30,17 +29,29 @@ public class LevelDate {
 
     private int heuristic() {
         int val = 0;
-        val += -1 * distanceToGhost(ghostsLocation.get(0));
-        val += -1 * distanceToGhost(ghostsLocation.get(1));
 
+        if(data[pacmanLocation.x][pacmanLocation.y] % 16 == 0)
+            data[pacmanLocation.x][pacmanLocation.y] = 0;
 
-        val += countOfDotsAroundPacman();
+        val += distanceToGhost(ghostsLocation.get(0));
+        val += distanceToGhost(ghostsLocation.get(1));
+
+        val += 5 * countOfDotsAroundPacman();
+        val += -1 * 15 * countOfDotsAllMap();
+        return val;
+    }
+
+    private int countOfDotsAllMap() {
+        int val = 0;
+        for (int i = 0; i < data.length; i++)
+            for (int j = 0; j < data[0].length; j++)
+                if (data[i][j] % 16 == 0)
+                    val++;
         return val;
     }
 
     private int countOfDotsAroundPacman() {
         int val = 0;
-
         for (int i = pacmanLocation.x - radius; i <= pacmanLocation.x + radius; i++)
             for (int j = pacmanLocation.y - radius; j <= pacmanLocation.y + radius; j++)
                 if (i >= 0 && i < data.length && j >= 0 && j < data.length)
