@@ -24,15 +24,9 @@ public class PacmanGameVisual extends JFrame {
             {0, 9, 10, 10, 14, 0, 0, 9, 12, 0, 0, 11, 10, 10, 12, 0},
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
     };
-<<<<<<< Updated upstream
     Pacman pacman;
     Ghost ghost;
     Random random = new Random();
-=======
-    private Pacman pacman;
-    private Ghost ghost1,ghost2;
-    private Random random = new Random();
->>>>>>> Stashed changes
 
     public PacmanGameVisual() {
         Graph mainGraph = buildGraphOnMatrix(levelData);

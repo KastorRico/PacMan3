@@ -19,11 +19,7 @@ public class Ghost {
     private int directionGhostX, directionGhostY;
     private int GhostAnimPos = 0;
 
-<<<<<<< Updated upstream
     public Ghost(SearchPath searchPath, supporting.Point startPosition, supporting.Point finishPosition) {
-=======
-    public Ghost(Board board, Point startPosition) {
->>>>>>> Stashed changes
         this.searchPath = searchPath;
         this.startPosition = startPosition;
         this.finishPosition = finishPosition;
