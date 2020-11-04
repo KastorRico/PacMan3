@@ -104,6 +104,12 @@ public class Board extends JPanel implements ActionListener {
                 int x = j * BLOCK_SIZE;
                 int y = i * BLOCK_SIZE;
                 g2d.setColor(mazeColor);
+                if ((screenData[i][j] | 0)==0 || (screenData[i][j]&16) != 0) {
+                    Color roads = new Color(255, 110, 0);
+                    g2d.setColor(roads);
+                    g2d.fillRect(x, y, BLOCK_SIZE, BLOCK_SIZE);
+                    g2d.setColor(mazeColor);
+                }
 
                 if ((screenData[i][j] & 1) != 0) {
                     g2d.drawLine(x, y, x, y + BLOCK_SIZE - 1);
@@ -164,7 +170,7 @@ public class Board extends JPanel implements ActionListener {
 
     private void doDrawing(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.black);
+        g2d.setColor(Color.BLACK);
 
         drawMaze(g2d);
         pacman.step(g2d);
