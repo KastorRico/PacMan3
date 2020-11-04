@@ -1,9 +1,22 @@
+<<<<<<< Updated upstream
+=======
+import supporting.AlphaBetaPruning;
+import supporting.MainProcessTree;
+import supporting.Point;
+
+>>>>>>> Stashed changes
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+<<<<<<< Updated upstream
+=======
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Random;
+>>>>>>> Stashed changes
 
 public class Board extends JPanel implements ActionListener {
     static final int BLOCK_SIZE = 24;
@@ -14,6 +27,7 @@ public class Board extends JPanel implements ActionListener {
     Timer timer;
     public short[][] screenData;
     Pacman pacman;
+<<<<<<< Updated upstream
     Ghost ghost;
 
     public Board(short[][] screenData, Pacman pacman, Ghost ghost) {
@@ -22,12 +36,60 @@ public class Board extends JPanel implements ActionListener {
         this.ghost =ghost;
         pacman.setBoard(this);
         ghost.setBoard(this);
+=======
+    ArrayList<Ghost> ghosts = new ArrayList<>();
+    ArrayList<Point> dots = new ArrayList<>();
+    private Random random = new Random();
+    private Dimension d;
+    private Color mazeColor;
+    private int level = 0;
+    private int scope = 0;
+
+    private Point PACMAN_START = new Point(0, 0);
+
+    public Board(short[][] screenData) {
+        this.emptyScreenData = screenData.clone();
+        this.pacman = new Pacman(this,  PACMAN_START);
+        countOfLife = DEFAULT_COUNT_OF_LIVE;
+
+        ghosts = new ArrayList<>(DEFAULT_COUNT_OF_GHOSTS);
+        ArrayList<Point> ghosts_start = new ArrayList<>();
+        Point ghost_start = null;
+        for (int i = 0; i < DEFAULT_COUNT_OF_GHOSTS; i++) {
+            ghost_start = searchEmptyPoint(screenData);
+            ghosts_start.add(ghost_start);
+            ghosts.add(new Ghost(this, ghost_start));
+        }
+        MainProcessTree tree = new MainProcessTree(screenData,PACMAN_START,ghosts_start,dots);
+        int tr = 0;
+        while (tr < 5){
+            //pacman.searchPath = new AlphaBetaPruning(tree);
+            AlphaBetaPruning abp = new AlphaBetaPruning(tree);
+            pacman.searchPath.addAll(abp.getPacmanWay());
+            tr++;
+            tree = new MainProcessTree(screenData,pacman.searchPath.getLast(),ghosts_start,dots);
+        }
+        levelUp();
+>>>>>>> Stashed changes
         initVariables();
         initBoard();
     }
 
+<<<<<<< Updated upstream
     public Board(short[][] screenData) {
         this.screenData = screenData.clone();
+=======
+    private void levelUp() {
+        level++;
+        countOfDots = startCountOfDots + level * deltaLevelDots;
+        dots.clear();
+        screenData = emptyScreenData.clone();
+        for(int i = 0; i < countOfDots; i++){
+            Point dotPoint = searchEmptyPoint(screenData);
+            dots.add(dotPoint);
+            screenData[dotPoint.x][dotPoint.y] = 16;
+        }
+>>>>>>> Stashed changes
     }
 
     private void initBoard() {
@@ -42,7 +104,7 @@ public class Board extends JPanel implements ActionListener {
         mazeColor = new Color(5, 100, 5);
         d = new Dimension(400, 400);
 
-        timer = new Timer(10, this);
+        timer = new Timer(50, this);
         timer.start();
     }
 
@@ -82,6 +144,7 @@ public class Board extends JPanel implements ActionListener {
 
                 if ((screenData[i][j] & 16) != 0) {
                     g2d.setColor(dotColor);
+                    dots.add(new Point(i,j));
                     g2d.fillOval(x + BLOCK_SIZE / 2 - POINT_SIZE / 2, y + BLOCK_SIZE / 2 - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE);
                 }
             }
@@ -94,13 +157,39 @@ public class Board extends JPanel implements ActionListener {
         doDrawing(g);
     }
 
+<<<<<<< Updated upstream
+=======
+    private boolean isPacmanDie() {
+        for(Ghost ghost: ghosts)
+            if(pacman.pacman_x == ghost.ghost_x && pacman.pacman_y == ghost.ghost_y)
+                return true;
+        return false;
+    }
+
+    private void pacmanDie() {
+        countOfLife--;
+        if(countOfLife <= 0) stop(); // END GAME
+
+        ghosts = new ArrayList<>(DEFAULT_COUNT_OF_GHOSTS);
+        for (int i = 0; i < DEFAULT_COUNT_OF_GHOSTS; i++)
+            ghosts.add(new Ghost( this, searchEmptyPoint(screenData)));
+
+        pacman.pacman_x = PACMAN_START.x;
+        pacman.pacman_y = PACMAN_START.y;
+    }
+
+>>>>>>> Stashed changes
     private void doDrawing(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.black);
 
         drawMaze(g2d);
         pacman.step(g2d);
+<<<<<<< Updated upstream
         ghost.step(g2d);
+=======
+        //ghosts.forEach(ghost -> ghost.step(g2d));
+>>>>>>> Stashed changes
         Toolkit.getDefaultToolkit().sync();
         g2d.dispose();
     }
