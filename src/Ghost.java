@@ -1,25 +1,32 @@
+import supporting.MainProcessTree;
 import supporting.Point;
 import supporting.SearchPath;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Ghost {
-    static final int Ghost_ANIM_IMAGE = 5;
-    private static final int ANIMATION_STEPS = 1;
+    static final int Ghost_ANIM_IMAGE = 1;
+    private static final int ANIMATION_STEPS = 5;
+    private static int freeId = 0;
     private static Image ghost;
-
+    public int ghost_x, ghost_y;
     int animationCount = 0;
     int additionAnimationY = 0, additionAnimationX = 0;
     SearchPath searchPath;
     Board board;
-    public int ghost_x, ghost_y;
+    ArrayDeque<List<Point>> pointList;
+    private int id;
     private int directionGhostX, directionGhostY;
     private int ghostAnimPos = 0;
 
     public Ghost(SearchPath searchPath, Board board, Point startPosition) {
         this.searchPath = searchPath;
         this.board = board;
+        id = freeId++;
         ghost_x = startPosition.x;
         ghost_y = startPosition.y;
         initGhostImages();
@@ -46,8 +53,19 @@ public class Ghost {
     }
 
     void animationMoveGhost() {
-        //Point point = searchPath.getNextVisualPoint();
-        //moveGhostTo(point.y, point.x);
+        if (pointList == null || pointList.isEmpty()) {
+            ArrayList<Point> listGhost = new ArrayList<>();
+            listGhost.add(new Point(board.ghosts.get(0).ghost_x, board.ghosts.get(0).ghost_y));
+            listGhost.add(new Point(board.ghosts.get(1).ghost_x, board.ghosts.get(1).ghost_y));
+            pointList = searchPath.findGhostStrategy(
+                    new MainProcessTree(
+                            board.screenData,
+                            new Point(board.pacman.pacman_x, board.pacman.pacman_y),
+                            listGhost));
+        }
+        Point p = pointList.pollLast().get(id);
+        System.out.println("Ghost id(" + id + ") pos: " + new Point(ghost_x, ghost_y));
+        moveGhostTo(p.y, p.x);
     }
 
     private void moveGhostTo(int j, int i) {

@@ -12,7 +12,7 @@ public class AlphaBetaPruning {
     }
 
     private int alphabeta(Node node, int depth, int alpha, int beta, boolean maximizingPlayer) {
-        if (depth == 0 || node.haveChildren()) return node.value.getWeight();
+        if (depth == 0 || !node.haveChildren()) return node.value.getWeight();
         if (maximizingPlayer) {
             node.value.setWeight(Integer.MIN_VALUE);
             for (Node child : node.childrenList) {

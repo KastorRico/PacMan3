@@ -4,6 +4,7 @@ import supporting.SearchPath;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 
 public class Pacman {
@@ -17,6 +18,7 @@ public class Pacman {
     int additionAnimationY = 0, additionAnimationX = 0;
     SearchPath searchPath;
     Board board;
+    ArrayDeque<Point> pointList;
     private int directionPacmanX, directionPacmanY;
     private int pacmanAnimPos = 0;
 
@@ -45,15 +47,18 @@ public class Pacman {
     }
 
     void animationMovePacman() {
-        ArrayList<Point> listGhost = new ArrayList<>();
-        listGhost.add(new Point(board.ghosts.get(0).ghost_x, board.ghosts.get(0).ghost_y));
-        listGhost.add(new Point(board.ghosts.get(1).ghost_x, board.ghosts.get(1).ghost_y));
-        Point pointList = searchPath.findStrategy(
-                new MainProcessTree(
-                        board.screenData,
-                        new Point(pacman_x, pacman_y),
-                        listGhost));
-        movePacmanTo(pointList.x, pointList.y);
+        if (pointList == null || pointList.isEmpty()) {
+            ArrayList<Point> listGhost = new ArrayList<>();
+            listGhost.add(new Point(board.ghosts.get(0).ghost_x, board.ghosts.get(0).ghost_y));
+            listGhost.add(new Point(board.ghosts.get(1).ghost_x, board.ghosts.get(1).ghost_y));
+            pointList = searchPath.findPacmanStrategy(
+                    new MainProcessTree(
+                            board.screenData,
+                            new Point(pacman_x, pacman_y),
+                            listGhost));
+        }
+            Point p = pointList.pollLast();
+            movePacmanTo(p.y, p.x);
     }
 
     private void movePacmanTo(int j, int i) {

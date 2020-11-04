@@ -3,7 +3,7 @@ package supporting;
 import java.util.ArrayList;
 
 public class MainProcessTree {
-    private static final int NUM_OF_LEVELS = 0;
+    private static final int NUM_OF_LEVELS = 3;
 
     private short[][] screenData;
     private Point pacmanPosition;
@@ -16,21 +16,26 @@ public class MainProcessTree {
         this.ghosts = new ArrayList<>();
         this.ghosts.addAll(ghosts);
         root = new Node(new LevelDate(screenData, pacmanPosition, ghosts), null);
-        generateVariations(screenData, pacmanPosition, ghosts);
+
+        generateVariations(root, NUM_OF_LEVELS);
     }
 
     public Node getRoot() {
         return root;
     }
 
-    private void generateVariations(short[][] screenData, Point pacman, ArrayList<Point> ghosts) {
+    private void generateVariations(Node nodeIn, int levels) {
+        if(levels <= 0) return;
+        generateOneVariant(nodeIn.value.pacmanLocation.x - 1, nodeIn.value.pacmanLocation.y, nodeIn);
+        generateOneVariant(nodeIn.value.pacmanLocation.x + 1, nodeIn.value.pacmanLocation.y, nodeIn);
+        generateOneVariant(nodeIn.value.pacmanLocation.x, nodeIn.value.pacmanLocation.y - 1, nodeIn);
+        generateOneVariant(nodeIn.value.pacmanLocation.x, nodeIn.value.pacmanLocation.y + 1, nodeIn);
 
-        generateOneVariant(pacman.x - 1, pacman.y);
-        generateOneVariant(pacman.x + 1, pacman.y);
-        generateOneVariant(pacman.x, pacman.y - 1);
-        generateOneVariant(pacman.x, pacman.y + 1);
+        for (Node node : nodeIn.childrenList)
+            for (Node node1 : node.childrenList)
+                generateVariations(node1, levels - 1);
 
-        for (Node node : root.childrenList)
+       /* for (Node node : nodeIn.childrenList)
             for (Node node1 : node.childrenList) {
                 Point pacmanPosition = node1.value.getPacmanLocation();
                 if (checkPosition(pacmanPosition.x + 1, pacmanPosition.y)) {
@@ -45,19 +50,19 @@ public class MainProcessTree {
                 if (checkPosition(pacmanPosition.x, pacmanPosition.y - 1)) {
                     node1.addChildren(new Node(new LevelDate(node1.value.data, new Point(pacmanPosition.x, pacmanPosition.y - 1), node1.value.ghostsLocation), node1));
                 }
-            }
+            }*/
     }
 
-    private void generateOneVariant(int x, int y) {
+    private void generateOneVariant(int x, int y, Node node) {
         if (checkPosition(x, y)) {
-            Node newNode = new Node(new LevelDate(screenData, new Point(x, y), ghosts), root);
-            root.addChildren(newNode);
+            Node newNode = new Node(new LevelDate(screenData, new Point(x, y), ghosts), node);
+            node.addChildren(newNode);
             addLevelDataGhosts(newNode);
         }
     }
 
     private boolean checkPosition(int x, int y) {
-        return(x < screenData.length && x >= 0 && y < screenData.length && y >= 0 && (screenData[x][y] == 0 || screenData[x][y] == 16));
+        return(x < screenData.length && x >= 0 && y < screenData.length && y >= 0 && (screenData[y][x] == 0 || screenData[y][x] == 16));
     }
 
 

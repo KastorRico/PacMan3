@@ -15,7 +15,7 @@ public class Board extends JPanel implements ActionListener {
     static final int POINT_SIZE = 6;
     final Color dotColor = new Color(192, 192, 0);
 
-    private final int startCountOfDots = 32;
+    private final int startCountOfDots = 120;
     private int countOfDots;
     private final int deltaLevelDots = 1;
 
@@ -68,15 +68,14 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private boolean checkLevelData() {
-
-        if(screenData[pacman.pacman_x][pacman.pacman_y] % 16 == 0){
-            screenData[pacman.pacman_x][pacman.pacman_y] = 0;
+        if(screenData[pacman.pacman_y][pacman.pacman_x] == 16){
+            screenData[pacman.pacman_y][pacman.pacman_x] = 0;
         scope++;}
 
         int countOfDots = 0;
         for (int i = 0; i < screenData.length; i++)
             for (int j = 0; j < screenData[0].length; j++)
-                if (screenData[i][j] % 16 == 0)
+                if (screenData[i][j] == 16)
                     countOfDots++;
         return countOfDots == 0;
     }
@@ -85,7 +84,7 @@ public class Board extends JPanel implements ActionListener {
         mazeColor = new Color(5, 100, 5);
         d = new Dimension(400, 400);
 
-        timer = new Timer(500, this);
+        timer = new Timer(50, this);
         timer.start();
     }
 
@@ -175,6 +174,7 @@ public class Board extends JPanel implements ActionListener {
         drawMaze(g2d);
         pacman.step(g2d);
         ghosts.forEach(ghost -> ghost.step(g2d));
+        System.out.println();
         Toolkit.getDefaultToolkit().sync();
         g2d.dispose();
     }
@@ -192,7 +192,7 @@ public class Board extends JPanel implements ActionListener {
     private Point searchEmptyPoint(short[][] levelData) {
         Point randomPoint;
         do {
-            randomPoint = new Point(random.nextInt(15), random.nextInt(15));
+            randomPoint = new Point(random.nextInt(16), random.nextInt(16));
             if (levelData[randomPoint.x][randomPoint.y] != 0)
                 continue;
             break;

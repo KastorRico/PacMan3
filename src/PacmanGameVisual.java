@@ -24,6 +24,7 @@ public class PacmanGameVisual extends JFrame {
             {0, 15, 0, 11, 8, 8, 14, 0, 3, 2, 6, 0, 11, 8, 14,0},
             {0, 0, 0, 0, 0, 0, 0, 0, 1, 32, 4, 0, 0, 0, 0, 0}
     };
+
     private Pacman pacman;
     private Ghost ghost;
     private Random random = new Random();
