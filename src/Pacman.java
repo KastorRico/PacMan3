@@ -1,9 +1,9 @@
+import supporting.MainProcessTree;
 import supporting.Point;
 import supporting.SearchPath;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 
 public class Pacman {
@@ -12,19 +12,17 @@ public class Pacman {
     private static Image pacman1, pacman2up, pacman2left, pacman2right, pacman2down;
     private static Image pacman3up, pacman3down, pacman3left, pacman3right;
     private static Image pacman4up, pacman4down, pacman4left, pacman4right;
-
+    public int pacman_x, pacman_y;
     int animationCount = 0;
     int additionAnimationY = 0, additionAnimationX = 0;
-    //SearchPath searchPath;
-    ArrayDeque<Point> searchPath = new ArrayDeque<>();
+    SearchPath searchPath;
     Board board;
-    public int pacman_x, pacman_y;
     private int directionPacmanX, directionPacmanY;
     private int pacmanAnimPos = 0;
 
-    public Pacman(Board board, Point start) {
+    public Pacman(SearchPath searchPath, Board board, Point start) {
         initPacmanImages();
-      //  this.searchPath = searchPath;
+        this.searchPath = searchPath;
         this.board = board;
         pacman_x = start.x;
         pacman_y = start.y;
@@ -47,12 +45,15 @@ public class Pacman {
     }
 
     void animationMovePacman() {
-        //Point point = searchPath.getNextVisualPoint();
-        Point point = searchPath.pop();
-        if (point == null)
-            board.stop();
-        else
-            movePacmanTo(point.y, point.x);
+        ArrayList<Point> listGhost = new ArrayList<>();
+        listGhost.add(new Point(board.ghosts.get(0).ghost_x, board.ghosts.get(0).ghost_y));
+        listGhost.add(new Point(board.ghosts.get(1).ghost_x, board.ghosts.get(1).ghost_y));
+        Point pointList = searchPath.findStrategy(
+                new MainProcessTree(
+                        board.screenData,
+                        new Point(pacman_x, pacman_y),
+                        listGhost));
+        movePacmanTo(pointList.x, pointList.y);
     }
 
     private void movePacmanTo(int j, int i) {
