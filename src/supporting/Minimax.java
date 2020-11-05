@@ -25,7 +25,6 @@ public class Minimax implements SearchPath {
     @Override
     public ArrayDeque<List<Point>> findGhostStrategy(MainProcessTree tree) {
         helpToFind(GLOBAL_DEPTH, tree.getRoot(), true);
-
         ArrayDeque<List<Point>> deque = new ArrayDeque();
         findGhostPoint(deque, tree.getRoot());
         return deque;

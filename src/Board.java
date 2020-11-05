@@ -34,7 +34,7 @@ public class Board extends JPanel implements ActionListener {
     private int level = 0;
     private int scope = 0;
 
-    private Point PACMAN_START = new Point(0, 0);
+    private Point PACMAN_START = new Point(8, 8);
 
     public Board(short[][] screenData) {
         this.emptyScreenData = screenData.clone();
@@ -42,8 +42,8 @@ public class Board extends JPanel implements ActionListener {
         countOfLife = DEFAULT_COUNT_OF_LIVE;
 
         ghosts = new ArrayList<>(DEFAULT_COUNT_OF_GHOSTS);
-        for (int i = 0; i < DEFAULT_COUNT_OF_GHOSTS; i++)
-            ghosts.add(new Ghost(new Minimax(), this, new Point(15, 15)));//searchEmptyPoint(screenData)));
+            ghosts.add(new Ghost(new Minimax(), this, new Point(15, 15)));
+            ghosts.add(new Ghost(new Minimax(), this, new Point(0, 15)));
 
         levelUp();
         initVariables();
@@ -140,10 +140,10 @@ public class Board extends JPanel implements ActionListener {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        if(checkLevelData())
-            levelUp();
         if(isPacmanDie())
             pacmanDie();
+        if(checkLevelData())
+            levelUp();
 
         doDrawing(g);
     }
@@ -159,12 +159,14 @@ public class Board extends JPanel implements ActionListener {
         countOfLife--;
         if(countOfLife <= 0) stop(); // END GAME
 
-        ghosts = new ArrayList<>(DEFAULT_COUNT_OF_GHOSTS);
-        for (int i = 0; i < DEFAULT_COUNT_OF_GHOSTS; i++)
-            ghosts.add(new Ghost(new Minimax(), this, searchEmptyPoint(screenData)));
+        ghosts.get(0).ghost_x = 15; ghosts.get(0).ghost_y = 15;
+        ghosts.get(0).pointList.clear();
+        ghosts.get(1).ghost_x = 1; ghosts.get(1).ghost_y = 15;
+        ghosts.get(1).pointList.clear();
 
         pacman.pacman_x = PACMAN_START.x;
         pacman.pacman_y = PACMAN_START.y;
+        pacman.pointList.clear();
     }
 
     private void doDrawing(Graphics g) {
@@ -174,7 +176,6 @@ public class Board extends JPanel implements ActionListener {
         drawMaze(g2d);
         pacman.step(g2d);
         ghosts.forEach(ghost -> ghost.step(g2d));
-        System.out.println();
         Toolkit.getDefaultToolkit().sync();
         g2d.dispose();
     }

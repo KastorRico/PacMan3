@@ -7,6 +7,7 @@ import java.awt.*;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Ghost {
     static final int Ghost_ANIM_IMAGE = 1;
@@ -22,6 +23,7 @@ public class Ghost {
     private int id;
     private int directionGhostX, directionGhostY;
     private int ghostAnimPos = 0;
+    private Random random = new Random();
 
     public Ghost(SearchPath searchPath, Board board, Point startPosition) {
         this.searchPath = searchPath;
@@ -53,19 +55,44 @@ public class Ghost {
     }
 
     void animationMoveGhost() {
-        if (pointList == null || pointList.isEmpty()) {
-            ArrayList<Point> listGhost = new ArrayList<>();
-            listGhost.add(new Point(board.ghosts.get(0).ghost_x, board.ghosts.get(0).ghost_y));
-            listGhost.add(new Point(board.ghosts.get(1).ghost_x, board.ghosts.get(1).ghost_y));
-            pointList = searchPath.findGhostStrategy(
-                    new MainProcessTree(
-                            board.screenData,
-                            new Point(board.pacman.pacman_x, board.pacman.pacman_y),
-                            listGhost));
+        Point p = randomStep();
+        if (getRandomBoolean(60)) {//%
+            if (pointList == null || pointList.isEmpty()) {
+                ArrayList<Point> listGhost = new ArrayList<>();
+                listGhost.add(new Point(board.ghosts.get(0).ghost_x, board.ghosts.get(0).ghost_y));
+                listGhost.add(new Point(board.ghosts.get(1).ghost_x, board.ghosts.get(1).ghost_y));
+                pointList = searchPath.findGhostStrategy(
+                        new MainProcessTree(
+                                board.screenData,
+                                new Point(board.pacman.pacman_x, board.pacman.pacman_y),
+                                listGhost));
+            }
+            pointList.pollLast().get(id);
         }
-        Point p = pointList.pollLast().get(id);
-        System.out.println("Ghost id(" + id + ") pos: " + new Point(ghost_x, ghost_y));
         moveGhostTo(p.y, p.x);
+    }
+
+    private Point randomStep() {
+        List<Point> possiblePoint = new ArrayList();
+        if (checkPosition(ghost_x - 1, ghost_y, board.screenData))
+            possiblePoint.add(new Point(ghost_x - 1, ghost_y));
+        if (checkPosition(ghost_x + 1, ghost_y, board.screenData))
+            possiblePoint.add(new Point(ghost_x + 1, ghost_y));
+        if (checkPosition(ghost_x, ghost_y - 1, board.screenData))
+            possiblePoint.add(new Point(ghost_x, ghost_y - 1));
+        if (checkPosition(ghost_x, ghost_y + 1, board.screenData))
+            possiblePoint.add(new Point(ghost_x, ghost_y + 1));
+
+        return possiblePoint.get(random.nextInt(possiblePoint.size()));
+    }
+
+
+    private boolean checkPosition(int x, int y, short[][] screenData) {
+        return (x < screenData.length && x >= 0 && y < screenData.length && y >= 0 && (screenData[y][x] == 0 || screenData[y][x] == 16));
+    }
+
+    public boolean getRandomBoolean(int p) {
+        return (random.nextInt(100) + 1) < p;
     }
 
     private void moveGhostTo(int j, int i) {

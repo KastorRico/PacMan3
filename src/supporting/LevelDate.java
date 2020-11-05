@@ -13,8 +13,10 @@ public class LevelDate {
         for (int i = 0; i < levelData.length; i++)
             System.arraycopy(levelData[i], 0, data[i], 0, levelData[0].length);
 
+        this.ghostsLocation = new ArrayList<>();
+        this.ghostsLocation.addAll(ghostsLocation);
+
         this.pacmanLocation = pacmanLocation;
-        this.ghostsLocation = ghostsLocation;
         weight = heuristic();
     }
 
@@ -36,16 +38,18 @@ public class LevelDate {
         if (data[pacmanLocation.y][pacmanLocation.x] == 16)
             data[pacmanLocation.y][pacmanLocation.x] = 0;
 
-        val += distanceToGhost(ghostsLocation.get(0));
-        val += distanceToGhost(ghostsLocation.get(1));
+        val += 8 * distanceToGhost(ghostsLocation.get(0));
+        val += 8 * distanceToGhost(ghostsLocation.get(1));
 
 
         val += countOfDotsAroundPacman(14);
-        val += 3 * countOfDotsAroundPacman(8);
-        val += 7 * countOfDotsAroundPacman(4);
-        val += 15 * countOfDotsAroundPacman(2);
-        val += 31 * countOfDotsAroundPacman(1);
-        val += -100 * countOfDotsAllMap();
+        val += 2 * countOfDotsAroundPacman(8);
+        val += 4 * countOfDotsAroundPacman(4);
+        val += 8 * countOfDotsAroundPacman(2);
+        val += 16 * countOfDotsAroundPacman(1);
+
+        val += -16 * countOfDotsAllMap();
+        System.out.println();
         return val;
     }
 
@@ -55,6 +59,7 @@ public class LevelDate {
             for (int j = 0; j < data[0].length; j++)
                 if (data[i][j] == 16)
                     val++;
+        System.out.println("countOfDotsAllMap = " + val);
         return val;
     }
 
@@ -64,6 +69,7 @@ public class LevelDate {
             for (int j = pacmanLocation.x - radius; j <= pacmanLocation.x + radius; j++)
                 if (i >= 0 && i < data.length && j >= 0 && j < data.length)
                     if (data[i][j] == 16) val++;
+                System.out.println("countOfDotsAroundPacman(r = " + radius + ") = " + val);
         return val;
     }
 

@@ -57,8 +57,8 @@ public class Pacman {
                             new Point(pacman_x, pacman_y),
                             listGhost));
         }
-            Point p = pointList.pollLast();
-            movePacmanTo(p.y, p.x);
+        Point p = pointList.pollLast();
+        movePacmanTo(p.y, p.x);
     }
 
     private void movePacmanTo(int j, int i) {
