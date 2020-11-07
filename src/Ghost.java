@@ -56,7 +56,7 @@ public class Ghost {
 
     void animationMoveGhost() {
         Point p = randomStep();
-        if (getRandomBoolean(60)) {//%
+        if (getRandomBoolean(85)) {//%
             if (pointList == null || pointList.isEmpty()) {
                 ArrayList<Point> listGhost = new ArrayList<>();
                 listGhost.add(new Point(board.ghosts.get(0).ghost_x, board.ghosts.get(0).ghost_y));

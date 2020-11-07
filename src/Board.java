@@ -1,3 +1,4 @@
+import supporting.AlphaBetaPruning;
 import supporting.Minimax;
 import supporting.Point;
 
@@ -34,7 +35,7 @@ public class Board extends JPanel implements ActionListener {
     private int level = 0;
     private int scope = 0;
 
-    private Point PACMAN_START = new Point(8, 8);
+    private Point PACMAN_START = new Point(7, 8);
 
     public Board(short[][] screenData) {
         this.emptyScreenData = screenData.clone();
@@ -84,7 +85,7 @@ public class Board extends JPanel implements ActionListener {
         mazeColor = new Color(5, 100, 5);
         d = new Dimension(400, 400);
 
-        timer = new Timer(50, this);
+        timer = new Timer(1000, this);
         timer.start();
     }
 
@@ -103,7 +104,7 @@ public class Board extends JPanel implements ActionListener {
                 int x = j * BLOCK_SIZE;
                 int y = i * BLOCK_SIZE;
                 g2d.setColor(mazeColor);
-                if ((screenData[i][j] | 0)==0 || (screenData[i][j]&16) != 0) {
+                if (screenData[i][j]==0 || (screenData[i][j]&16) != 0) {
                     Color roads = new Color(255, 110, 0);
                     g2d.setColor(roads);
                     g2d.fillRect(x, y, BLOCK_SIZE, BLOCK_SIZE);

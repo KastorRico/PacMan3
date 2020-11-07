@@ -3,7 +3,7 @@ package supporting;
 import java.util.ArrayList;
 
 public class MainProcessTree {
-    private static final int NUM_OF_LEVELS = 3;
+    private static final int NUM_OF_LEVELS = 1;
 
     private Node root;
 
