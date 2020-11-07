@@ -11,10 +11,11 @@ public class Minimax implements SearchPath {
 
     @Override
     public ArrayDeque<Point> findPacmanStrategy(MainProcessTree tree) {
+        //System.out.println(tree);
         helpToFind(tree.getRoot(), true);
+        //System.out.println(tree);
 
         ArrayDeque<Point> deque = new ArrayDeque();
-
         findPacmanPoint(deque, tree.getRoot());
         return deque;
     }

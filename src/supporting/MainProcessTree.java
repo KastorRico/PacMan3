@@ -1,14 +1,15 @@
 package supporting;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainProcessTree {
-    private static final int NUM_OF_LEVELS = 1;
+    private static final int NUM_OF_LEVELS = 2;
 
     private Node root;
 
-    public MainProcessTree(short[][] screenData, Point pacmanPosition, ArrayList<Point> ghosts) {
-        root = new Node(new LevelDate(screenData, pacmanPosition, ghosts), null);
+    public MainProcessTree(short[][] screenData, Point pacmanPosition, ArrayList<Point> ghosts, HashMap<Point, Integer> map) {
+        root = new Node(new LevelDate(screenData, pacmanPosition, ghosts, map), null);
 
         generateVariations(root, NUM_OF_LEVELS);
     }
@@ -18,7 +19,7 @@ public class MainProcessTree {
     }
 
     private void generateVariations(Node nodeIn, int levels) {
-        if(levels <= 0) return;
+        if (levels <= 0) return;
         generateOneVariant(nodeIn.value.pacmanLocation.x - 1, nodeIn.value.pacmanLocation.y, nodeIn);
         generateOneVariant(nodeIn.value.pacmanLocation.x + 1, nodeIn.value.pacmanLocation.y, nodeIn);
         generateOneVariant(nodeIn.value.pacmanLocation.x, nodeIn.value.pacmanLocation.y - 1, nodeIn);
@@ -31,14 +32,14 @@ public class MainProcessTree {
 
     private void generateOneVariant(int x, int y, Node node) {
         if (checkPosition(x, y, node.value.data)) {
-            Node newNode = new Node(new LevelDate(node.value.data, new Point(x, y), node.value.ghostsLocation), node);
+            Node newNode = new Node(new LevelDate(node.value.data, new Point(x, y), node.value.ghostsLocation, node.value.map), node);
             node.addChildren(newNode);
             addLevelDataGhosts(newNode);
         }
     }
 
     private boolean checkPosition(int x, int y, short[][] screenData) {
-        return(x < screenData.length && x >= 0 && y < screenData.length && y >= 0 && (screenData[y][x] == 0 || screenData[y][x] == 16));
+        return (x < screenData.length && x >= 0 && y < screenData.length && y >= 0 && (screenData[y][x] == 0 || screenData[y][x] == 16));
     }
 
 
@@ -55,6 +56,7 @@ public class MainProcessTree {
         if (checkPosition(node.value.ghostsLocation.get(0).x, node.value.ghostsLocation.get(0).y - 1, node.value.data)) {
             moveFirstGhost(node.value.ghostsLocation.get(0).x, node.value.ghostsLocation.get(0).y - 1, node);
         }
+        moveFirstGhost(node.value.ghostsLocation.get(0).x, node.value.ghostsLocation.get(0).y, node);
     }
 
     private void moveFirstGhost(int ghostX, int ghostY, Node node) {
@@ -67,26 +69,52 @@ public class MainProcessTree {
             ArrayList<Point> list = new ArrayList();
             list.add(firstGhostPosition);
             list.add(new Point(node.value.ghostsLocation.get(1).x + 1, node.value.ghostsLocation.get(1).y));
-            node.addChildren(new Node(new LevelDate(node.value.data, node.value.getPacmanLocation(), list), node));
+            node.addChildren(new Node(new LevelDate(node.value.data, node.value.getPacmanLocation(), list, node.value.map), node));
         }
         if (checkPosition(node.value.ghostsLocation.get(1).x - 1, node.value.ghostsLocation.get(1).y, node.value.data)) {
             ArrayList<Point> list = new ArrayList();
             list.add(firstGhostPosition);
             list.add(new Point(node.value.ghostsLocation.get(1).x - 1, node.value.ghostsLocation.get(1).y));
-            node.addChildren(new Node(new LevelDate(node.value.data, node.value.getPacmanLocation(), list), node));
+            node.addChildren(new Node(new LevelDate(node.value.data, node.value.getPacmanLocation(), list, node.value.map), node));
         }
         if (checkPosition(node.value.ghostsLocation.get(1).x, node.value.ghostsLocation.get(1).y + 1, node.value.data)) {
             ArrayList<Point> list = new ArrayList();
             list.add(firstGhostPosition);
             list.add(new Point(node.value.ghostsLocation.get(1).x, node.value.ghostsLocation.get(1).y + 1));
-            node.addChildren(new Node(new LevelDate(node.value.data, node.value.getPacmanLocation(), list), node));
+            node.addChildren(new Node(new LevelDate(node.value.data, node.value.getPacmanLocation(), list, node.value.map), node));
 
         }
         if (checkPosition(node.value.ghostsLocation.get(1).x, node.value.ghostsLocation.get(1).y - 1, node.value.data)) {
             ArrayList<Point> list = new ArrayList();
             list.add(firstGhostPosition);
             list.add(new Point(node.value.ghostsLocation.get(1).x, node.value.ghostsLocation.get(1).y - 1));
-            node.addChildren(new Node(new LevelDate(node.value.data, node.value.getPacmanLocation(), list), node));
+            node.addChildren(new Node(new LevelDate(node.value.data, node.value.getPacmanLocation(), list, node.value.map), node));
         }
+
+        ArrayList<Point> list = new ArrayList();
+        list.add(firstGhostPosition);
+        list.add(new Point(node.value.ghostsLocation.get(1).x, node.value.ghostsLocation.get(1).y));
+        node.addChildren(new Node(new LevelDate(node.value.data, node.value.getPacmanLocation(), list, node.value.map), node));
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder str = new StringBuilder();
+        str.append("MainProcessTree:\n");
+        str.append(printNode(root, ""));
+        return str.toString();
+    }
+
+    private String printNode(Node fromNode, String prefix) {
+        StringBuilder str = new StringBuilder();
+        str.append(prefix)
+                .append("Node(pacman: ").append(fromNode.value.pacmanLocation)
+                .append(", ghost: 1 - ").append(fromNode.value.ghostsLocation.get(0)).append(", 2 - ").append(fromNode.value.ghostsLocation.get(1))
+                .append(", weight = ").append(fromNode.value.getWeight()).append("\n");
+
+        for (Node node : fromNode.childrenList) {
+            str.append(printNode(node, prefix + "    "));
+        }
+        return str.toString();
     }
 }

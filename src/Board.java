@@ -14,21 +14,18 @@ import java.util.Random;
 public class Board extends JPanel implements ActionListener {
     static final int BLOCK_SIZE = 24;
     static final int POINT_SIZE = 6;
-    final Color dotColor = new Color(192, 192, 0);
-
-    private final int startCountOfDots = 120;
-    private int countOfDots;
-    private final int deltaLevelDots = 1;
-
     private static final int DEFAULT_COUNT_OF_LIVE = 3;
     private static final int DEFAULT_COUNT_OF_GHOSTS = 2;
-    private int countOfLife;
-
+    final Color dotColor = new Color(192, 192, 0);
+    private final int startCountOfDots = 120;
+    private final int deltaLevelDots = 1;
     public Timer timer;
     public short[][] screenData;
     public short[][] emptyScreenData;
     Pacman pacman;
     ArrayList<Ghost> ghosts = new ArrayList<>();
+    private int countOfDots;
+    private int countOfLife;
     private Random random = new Random();
     private Dimension d;
     private Color mazeColor;
@@ -39,14 +36,15 @@ public class Board extends JPanel implements ActionListener {
 
     public Board(short[][] screenData) {
         this.emptyScreenData = screenData.clone();
-        this.pacman = new Pacman(new Minimax(), this,  PACMAN_START);
+
+        levelUp();
+        this.pacman = new Pacman(new AlphaBetaPruning(), this, PACMAN_START);
         countOfLife = DEFAULT_COUNT_OF_LIVE;
 
         ghosts = new ArrayList<>(DEFAULT_COUNT_OF_GHOSTS);
-            ghosts.add(new Ghost(new Minimax(), this, new Point(15, 15)));
-            ghosts.add(new Ghost(new Minimax(), this, new Point(0, 15)));
+        ghosts.add(new Ghost(new Minimax(), this, new Point(15, 15)));
+        ghosts.add(new Ghost(new Minimax(), this, new Point(3, 15)));
 
-        levelUp();
         initVariables();
         initBoard();
     }
@@ -56,7 +54,7 @@ public class Board extends JPanel implements ActionListener {
         countOfDots = startCountOfDots + level * deltaLevelDots;
 
         screenData = emptyScreenData.clone();
-        for(int i = 0; i < countOfDots; i++){
+        for (int i = 0; i < countOfDots; i++) {
             Point dotPoint = searchEmptyPoint(screenData);
             screenData[dotPoint.x][dotPoint.y] = 16;
         }
@@ -69,9 +67,10 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private boolean checkLevelData() {
-        if(screenData[pacman.pacman_y][pacman.pacman_x] == 16){
-            screenData[pacman.pacman_y][pacman.pacman_x] = 0;
-        scope++;}
+        if (screenData[pacman.pacmanY][pacman.pacmanX] == 16) {
+            screenData[pacman.pacmanY][pacman.pacmanX] = 0;
+            scope++;
+        }
 
         int countOfDots = 0;
         for (int i = 0; i < screenData.length; i++)
@@ -85,7 +84,7 @@ public class Board extends JPanel implements ActionListener {
         mazeColor = new Color(5, 100, 5);
         d = new Dimension(400, 400);
 
-        timer = new Timer(1000, this);
+        timer = new Timer(20, this);
         timer.start();
     }
 
@@ -104,7 +103,7 @@ public class Board extends JPanel implements ActionListener {
                 int x = j * BLOCK_SIZE;
                 int y = i * BLOCK_SIZE;
                 g2d.setColor(mazeColor);
-                if (screenData[i][j]==0 || (screenData[i][j]&16) != 0) {
+                if (screenData[i][j] == 0 || (screenData[i][j] & 16) != 0) {
                     Color roads = new Color(255, 110, 0);
                     g2d.setColor(roads);
                     g2d.fillRect(x, y, BLOCK_SIZE, BLOCK_SIZE);
@@ -141,32 +140,35 @@ public class Board extends JPanel implements ActionListener {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        if(isPacmanDie())
+        if (isPacmanDie())
             pacmanDie();
-        if(checkLevelData())
+        if (checkLevelData())
             levelUp();
 
         doDrawing(g);
     }
 
     private boolean isPacmanDie() {
-        for(Ghost ghost: ghosts)
-            if(pacman.pacman_x == ghost.ghost_x && pacman.pacman_y == ghost.ghost_y)
+        for (Ghost ghost : ghosts)
+            if ((pacman.pacmanX == ghost.ghostX && pacman.pacmanY == ghost.ghostY) ||
+                    (ghost.ghostYOld == pacman.pacmanY && ghost.ghostXOld == pacman.pacmanX && ghost.ghostX == pacman.pacmanXOld && ghost.ghostY == pacman.pacmanYOld))
                 return true;
         return false;
     }
 
     private void pacmanDie() {
         countOfLife--;
-        if(countOfLife <= 0) stop(); // END GAME
+        if (countOfLife <= 0) stop(); // END GAME
 
-        ghosts.get(0).ghost_x = 15; ghosts.get(0).ghost_y = 15;
+        ghosts.get(0).ghostX = 15;
+        ghosts.get(0).ghostY = 15;
         ghosts.get(0).pointList.clear();
-        ghosts.get(1).ghost_x = 1; ghosts.get(1).ghost_y = 15;
+        ghosts.get(1).ghostX = 1;
+        ghosts.get(1).ghostY = 15;
         ghosts.get(1).pointList.clear();
 
-        pacman.pacman_x = PACMAN_START.x;
-        pacman.pacman_y = PACMAN_START.y;
+        pacman.pacmanX = PACMAN_START.x;
+        pacman.pacmanY = PACMAN_START.y;
         pacman.pointList.clear();
     }
 

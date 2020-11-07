@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Pacman {
     static final int PACMAN_ANIM_IMAGE = 4;
@@ -13,12 +14,14 @@ public class Pacman {
     private static Image pacman1, pacman2up, pacman2left, pacman2right, pacman2down;
     private static Image pacman3up, pacman3down, pacman3left, pacman3right;
     private static Image pacman4up, pacman4down, pacman4left, pacman4right;
-    public int pacman_x, pacman_y;
+    public int pacmanX, pacmanY;
+    public int pacmanXOld, pacmanYOld;
     int animationCount = 0;
     int additionAnimationY = 0, additionAnimationX = 0;
     SearchPath searchPath;
     Board board;
     ArrayDeque<Point> pointList;
+    HashMap<Point, Integer> map;
     private int directionPacmanX, directionPacmanY;
     private int pacmanAnimPos = 0;
 
@@ -26,8 +29,15 @@ public class Pacman {
         initPacmanImages();
         this.searchPath = searchPath;
         this.board = board;
-        pacman_x = start.x;
-        pacman_y = start.y;
+
+        map = new HashMap<>();
+        for (int i = 0; i < board.screenData.length; i++)
+            for (int j = 0; j < board.screenData[0].length; j++)
+                if (board.screenData[i][j] == 0 || board.screenData[i][j] == 16)
+                    map.put(new Point(j, i), 0);
+
+        pacmanX = start.x;
+        pacmanY = start.y;
     }
 
     void initPacmanImages() {
@@ -47,26 +57,31 @@ public class Pacman {
     }
 
     void animationMovePacman() {
-        if (pointList == null || pointList.isEmpty()) {
+        //if (pointList == null || pointList.isEmpty()) {
             ArrayList<Point> listGhost = new ArrayList<>();
-            listGhost.add(new Point(board.ghosts.get(0).ghost_x, board.ghosts.get(0).ghost_y));
-            listGhost.add(new Point(board.ghosts.get(1).ghost_x, board.ghosts.get(1).ghost_y));
+            listGhost.add(new Point(board.ghosts.get(0).ghostX, board.ghosts.get(0).ghostY));
+            listGhost.add(new Point(board.ghosts.get(1).ghostX, board.ghosts.get(1).ghostY));
             pointList = searchPath.findPacmanStrategy(
                     new MainProcessTree(
                             board.screenData,
-                            new Point(pacman_x, pacman_y),
-                            listGhost));
-        }
+                            new Point(pacmanX, pacmanY),
+                            listGhost,
+                            map));
+            pointList.forEach(p -> System.out.print(p + ", "));
+            System.out.println();
+        //}
         Point p = pointList.pollLast();
+        map.put(p, map.get(p) + 1);
         movePacmanTo(p.y, p.x);
     }
 
     private void movePacmanTo(int j, int i) {
-        directionPacmanX = (i - pacman_x);
-        directionPacmanY = (j - pacman_y);
-
-        pacman_x = i;
-        pacman_y = j;
+        directionPacmanX = (i - pacmanX);
+        directionPacmanY = (j - pacmanY);
+        pacmanXOld = pacmanX;
+        pacmanYOld = pacmanY;
+        pacmanX = i;
+        pacmanY = j;
     }
 
     public void drawPacmanEating(Graphics2D g2d) {
@@ -75,13 +90,13 @@ public class Pacman {
         pacmanAnimPos++;
         pacmanAnimPos %= PACMAN_ANIM_IMAGE;
         if (directionPacmanX == -1) {
-            drawPacmanEatingLeft(g2d, pacman_x * Board.BLOCK_SIZE + additionAnimationX, pacman_y * Board.BLOCK_SIZE + additionAnimationY);
+            drawPacmanEatingLeft(g2d, pacmanX * Board.BLOCK_SIZE + additionAnimationX, pacmanY * Board.BLOCK_SIZE + additionAnimationY);
         } else if (directionPacmanX == 1) {
-            drawPacmanEatingRight(g2d, pacman_x * Board.BLOCK_SIZE + additionAnimationX, pacman_y * Board.BLOCK_SIZE + additionAnimationY);
+            drawPacmanEatingRight(g2d, pacmanX * Board.BLOCK_SIZE + additionAnimationX, pacmanY * Board.BLOCK_SIZE + additionAnimationY);
         } else if (directionPacmanY == -1) {
-            drawPacmanEatingUp(g2d, pacman_x * Board.BLOCK_SIZE + additionAnimationX, pacman_y * Board.BLOCK_SIZE + additionAnimationY);
+            drawPacmanEatingUp(g2d, pacmanX * Board.BLOCK_SIZE + additionAnimationX, pacmanY * Board.BLOCK_SIZE + additionAnimationY);
         } else {
-            drawPacmanEatingDown(g2d, pacman_x * Board.BLOCK_SIZE + additionAnimationX, pacman_y * Board.BLOCK_SIZE + additionAnimationY);
+            drawPacmanEatingDown(g2d, pacmanX * Board.BLOCK_SIZE + additionAnimationX, pacmanY * Board.BLOCK_SIZE + additionAnimationY);
         }
     }
 

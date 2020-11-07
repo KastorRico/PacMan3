@@ -10,11 +10,13 @@ import java.util.List;
 import java.util.Random;
 
 public class Ghost {
-    static final int Ghost_ANIM_IMAGE = 1;
+    static final int Ghost_ANIM_IMAGE = 4;
     private static final int ANIMATION_STEPS = 5;
     private static int freeId = 0;
-    private static Image ghost;
-    public int ghost_x, ghost_y;
+    private static Image ghost_left1, ghost_left2, ghost_left3, ghost_right1, ghost_right2, ghost_right3;
+    private static Image ghost_up1, ghost_up2, ghost_up3, ghost_down1, ghost_down2, ghost_down3;
+    public int ghostX, ghostY;
+    public int ghostXOld, ghostYOld;
     int animationCount = 0;
     int additionAnimationY = 0, additionAnimationX = 0;
     SearchPath searchPath;
@@ -29,13 +31,24 @@ public class Ghost {
         this.searchPath = searchPath;
         this.board = board;
         id = freeId++;
-        ghost_x = startPosition.x;
-        ghost_y = startPosition.y;
+        ghostX = startPosition.x;
+        ghostY = startPosition.y;
         initGhostImages();
     }
 
     private void initGhostImages() {
-        ghost = new ImageIcon("images/ghost.png").getImage();
+        ghost_left1 = new ImageIcon("images/ghost_left1.png").getImage();
+        ghost_left2 = new ImageIcon("images/ghost_left2.png").getImage();
+        ghost_left3 = new ImageIcon("images/ghost_left3.png").getImage();
+        ghost_right1 = new ImageIcon("images/ghost_right1.png").getImage();
+        ghost_right2 = new ImageIcon("images/ghost_right2.png").getImage();
+        ghost_right3 = new ImageIcon("images/ghost_right3.png").getImage();
+        ghost_up1 = new ImageIcon("images/ghost_up1.png").getImage();
+        ghost_up2 = new ImageIcon("images/ghost_up2.png").getImage();
+        ghost_up3 = new ImageIcon("images/ghost_up3.png").getImage();
+        ghost_down1 = new ImageIcon("images/ghost_down1.png").getImage();
+        ghost_down2 = new ImageIcon("images/ghost_down2.png").getImage();
+        ghost_down3 = new ImageIcon("images/ghost_down3.png").getImage();
     }
 
     public void step(Graphics2D g2d) {
@@ -51,37 +64,108 @@ public class Ghost {
         additionAnimationY = -1 * directionGhostY * (ANIMATION_STEPS - animationCount) * (Board.BLOCK_SIZE / ANIMATION_STEPS);
         ghostAnimPos++;
         ghostAnimPos %= Ghost_ANIM_IMAGE;
-        g2d.drawImage(ghost, ghost_x * Board.BLOCK_SIZE + additionAnimationX, ghost_y * Board.BLOCK_SIZE + additionAnimationY, board);
+
+        if (directionGhostX == -1)
+            drawGhostLeft(g2d, ghostX * Board.BLOCK_SIZE + additionAnimationX, ghostY * Board.BLOCK_SIZE + additionAnimationY);
+        else if (directionGhostX == 1)
+            drawGhostRight(g2d, ghostX * Board.BLOCK_SIZE + additionAnimationX, ghostY * Board.BLOCK_SIZE + additionAnimationY);
+        else if (directionGhostY == -1)
+            drawGhostUp(g2d, ghostX * Board.BLOCK_SIZE + additionAnimationX, ghostY * Board.BLOCK_SIZE + additionAnimationY);
+        else
+            drawGhostDown(g2d, ghostX * Board.BLOCK_SIZE + additionAnimationX, ghostY * Board.BLOCK_SIZE + additionAnimationY);
+
     }
 
-    void animationMoveGhost() {
-        Point p = randomStep();
-        if (getRandomBoolean(85)) {//%
-            if (pointList == null || pointList.isEmpty()) {
-                ArrayList<Point> listGhost = new ArrayList<>();
-                listGhost.add(new Point(board.ghosts.get(0).ghost_x, board.ghosts.get(0).ghost_y));
-                listGhost.add(new Point(board.ghosts.get(1).ghost_x, board.ghosts.get(1).ghost_y));
-                pointList = searchPath.findGhostStrategy(
-                        new MainProcessTree(
-                                board.screenData,
-                                new Point(board.pacman.pacman_x, board.pacman.pacman_y),
-                                listGhost));
-            }
-            pointList.pollLast().get(id);
+    private void drawGhostUp(Graphics2D g2d, int x, int y) {
+        switch (ghostAnimPos) {
+            case 1:
+                g2d.drawImage(ghost_up1, x, y, board);
+                break;
+            case 2:
+                g2d.drawImage(ghost_up2, x, y, board);
+                break;
+            case 3:
+                g2d.drawImage(ghost_up3, x, y, board);
+                break;
         }
+    }
+
+    private void drawGhostDown(Graphics2D g2d, int x, int y) {
+        switch (ghostAnimPos) {
+            case 1:
+                g2d.drawImage(ghost_down1, x, y, board);
+                break;
+            case 2:
+                g2d.drawImage(ghost_down2, x, y, board);
+                break;
+            default:
+                g2d.drawImage(ghost_down3, x, y, board);
+                break;
+        }
+    }
+
+    private void drawGhostLeft(Graphics2D g2d, int x, int y) {
+        switch (ghostAnimPos) {
+            case 1:
+                g2d.drawImage(ghost_left1, x, y, board);
+                break;
+            case 2:
+                g2d.drawImage(ghost_left2, x, y, board);
+                break;
+            default:
+                g2d.drawImage(ghost_left3, x, y, board);
+                break;
+        }
+    }
+
+    private void drawGhostRight(Graphics2D g2d, int x, int y) {
+        switch (ghostAnimPos) {
+            case 1:
+                g2d.drawImage(ghost_right1, x, y, board);
+                break;
+            case 2:
+                g2d.drawImage(ghost_right2, x, y, board);
+                break;
+            default:
+                g2d.drawImage(ghost_right3, x, y, board);
+                break;
+        }
+    }
+
+
+    void animationMoveGhost() {
+        if (pointList == null || pointList.isEmpty()) {
+            ArrayList<Point> listGhost = new ArrayList<>();
+            listGhost.add(new Point(board.ghosts.get(0).ghostX, board.ghosts.get(0).ghostY));
+            listGhost.add(new Point(board.ghosts.get(1).ghostX, board.ghosts.get(1).ghostY));
+            pointList = searchPath.findGhostStrategy(
+                    new MainProcessTree(
+                            board.screenData,
+                            new Point(board.pacman.pacmanX, board.pacman.pacmanY),
+                            listGhost,
+                            board.pacman.map));
+        }
+        Point p = pointList.pollLast().get(id);
+
+        if (getRandomBoolean(15)) {//%
+            p = randomStep();
+            pointList.clear();
+        }
+
         moveGhostTo(p.y, p.x);
     }
 
     private Point randomStep() {
         List<Point> possiblePoint = new ArrayList();
-        if (checkPosition(ghost_x - 1, ghost_y, board.screenData))
-            possiblePoint.add(new Point(ghost_x - 1, ghost_y));
-        if (checkPosition(ghost_x + 1, ghost_y, board.screenData))
-            possiblePoint.add(new Point(ghost_x + 1, ghost_y));
-        if (checkPosition(ghost_x, ghost_y - 1, board.screenData))
-            possiblePoint.add(new Point(ghost_x, ghost_y - 1));
-        if (checkPosition(ghost_x, ghost_y + 1, board.screenData))
-            possiblePoint.add(new Point(ghost_x, ghost_y + 1));
+        if (checkPosition(ghostX - 1, ghostY, board.screenData))
+            possiblePoint.add(new Point(ghostX - 1, ghostY));
+        if (checkPosition(ghostX + 1, ghostY, board.screenData))
+            possiblePoint.add(new Point(ghostX + 1, ghostY));
+        if (checkPosition(ghostX, ghostY - 1, board.screenData))
+            possiblePoint.add(new Point(ghostX, ghostY - 1));
+        if (checkPosition(ghostX, ghostY + 1, board.screenData))
+            possiblePoint.add(new Point(ghostX, ghostY + 1));
+        possiblePoint.add(new Point(ghostX, ghostY));
 
         return possiblePoint.get(random.nextInt(possiblePoint.size()));
     }
@@ -92,14 +176,15 @@ public class Ghost {
     }
 
     public boolean getRandomBoolean(int p) {
-        return (random.nextInt(100) + 1) < p;
+        return (random.nextInt(100) + 1) <= p;
     }
 
     private void moveGhostTo(int j, int i) {
-        directionGhostX = (i - ghost_x);
-        directionGhostY = (j - ghost_y);
-
-        ghost_x = i;
-        ghost_y = j;
+        directionGhostX = (i - ghostX);
+        directionGhostY = (j - ghostY);
+        ghostXOld = ghostX;
+        ghostYOld = ghostY;
+        ghostX = i;
+        ghostY = j;
     }
 }
